@@ -9,6 +9,216 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <style>
+      /* --- Base Animations & Fire Theme --- */
+
+      /* Keyframe for the upward engulfing fire animation */
+      @keyframes engulf {
+        from {
+          transform: translateY(100%);
+          opacity: 0.8;
+        }
+        to {
+          transform: translateY(0%);
+          opacity: 1;
+        }
+      }
+
+      /* Keyframe for the subtle flickering glow on text and elements */
+      @keyframes flicker-glow {
+        0%, 100% {
+          text-shadow: 0 0 5px #ff8c00, 0 0 10px #ff8c00, 0 0 15px #ff4500, 0 0 20px #ff4500;
+          box-shadow: 0 0 5px #ff8c00, 0 0 10px #ff8c00, 0 0 15px #ff4500;
+        }
+        50% {
+          text-shadow: 0 0 6px #ffae42, 0 0 12px #ffae42, 0 0 18px #ff5e1a, 0 0 24px #ff5e1a;
+          box-shadow: 0 0 6px #ffae42, 0 0 12px #ffae42, 0 0 18px #ff5e1a;
+        }
+      }
+
+      /* Keyframe for the animated ember background */
+      @keyframes embers-bg {
+          0% { background-position: 0% 0%; }
+          50% { background-position: 20% -20%; }
+          100% { background-position: 0% 0%; }
+      }
+
+      /* --- Fire Theme Toggle Button --- */
+      #fire-theme-toggle {
+        width: 3rem;
+        height: 3rem;
+        border-radius: 9999px;
+        background-color: rgba(255, 255, 255, 0.8);
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,.1), 0 2px 4px -2px rgba(0,0,0,.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.4s ease-in-out;
+        color: #4b5563; /* gray-600 */
+      }
+      .dark #fire-theme-toggle {
+        background-color: rgba(31, 41, 55, 0.8); /* gray-800/80 */
+        color: #d1d5db; /* gray-300 */
+      }
+      #fire-theme-toggle:hover {
+        transform: scale(1.1);
+        color: #ff4500;
+        box-shadow: 0 0 20px 0px #ff4500, 0 0 30px 5px #ff8c00, inset 0 0 10px #ff4500;
+      }
+      #fire-theme-toggle.active {
+        color: #ff4500;
+        box-shadow: 0 0 20px 0px #ff4500, 0 0 30px 5px #ff8c00, inset 0 0 10px #ff4500;
+        animation: flicker-glow 2s infinite;
+      }
+      #fire-theme-toggle svg {
+        width: 1.5rem;
+        height: 1.5rem;
+      }
+
+      /* --- Fire Overlay for transition */
+      #fire-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        pointer-events: none;
+        background: linear-gradient(to top, 
+          rgba(255, 69, 0, 0.95) 0%, 
+          rgba(255, 140, 0, 0.8) 30%, 
+          rgba(255, 165, 0, 0.6) 50%, 
+          transparent 70%);
+        animation: engulf 1.5s cubic-bezier(0.6, 0.04, 0.98, 0.335) forwards;
+      }
+
+      /* --- GLOBAL FIRE THEME STYLES --- */
+      .fire-theme {
+        background-color: #120803 !important;
+        color: #e0d7d1 !important;
+        --fire-glow-color: #ff8c00;
+        --fire-glow-heavy: #ff4500;
+      }
+      /* Animated Embers Background */
+      .fire-theme::before {
+        content: "";
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: radial-gradient(circle at 20% 20%, rgba(255,165,0,0.3) 1px, transparent 1px),
+                          radial-gradient(circle at 80% 20%, rgba(255,165,0,0.3) 1px, transparent 1px),
+                          radial-gradient(circle at 50% 70%, rgba(255,100,0,0.2) 2px, transparent 2px),
+                          radial-gradient(circle at 10% 90%, rgba(255,100,0,0.2) 2px, transparent 2px);
+        background-size: 100px 100px;
+        animation: embers-bg 20s linear infinite;
+        z-index: -1;
+      }
+
+      /* --- General Element Styling --- */
+      .fire-theme h1, .fire-theme h2, .fire-theme h3, .fire-theme h4 {
+        color: #fff !important;
+        animation: flicker-glow 3s infinite alternate;
+      }
+      .fire-theme p, .fire-theme span, .fire-theme div, .fire-theme label {
+        color: #d1c7c1 !important;
+      }
+      .fire-theme button, .fire-theme a.button {
+        transition: all 0.3s ease-in-out !important;
+      }
+
+      /* --- Component Specific Overrides --- */
+      
+      /* Header & Logo */
+      .fire-theme header {
+        background-color: rgba(18, 8, 3, 0.8) !important;
+        text-shadow: 0 0 10px var(--fire-glow-heavy);
+      }
+      .fire-theme header span {
+        background-color: var(--fire-glow-heavy) !important;
+        box-shadow: 0 0 5px var(--fire-glow-heavy);
+      }
+
+      /* Home Section */
+      .fire-theme #home {
+        background-blend-mode: multiply;
+        background-color: #441c0a;
+      }
+      .fire-theme #home .bg-primary {
+        background-color: var(--fire-glow-heavy) !important;
+        border: 1px solid var(--fire-glow-color);
+        box-shadow: 0 0 15px var(--fire-glow-heavy);
+      }
+      .fire-theme #home .bg-transparent {
+        border-color: var(--fire-glow-color) !important;
+        color: var(--fire-glow-color) !important;
+      }
+      .fire-theme #home .bg-transparent:hover {
+        background-color: var(--fire-glow-color) !important;
+        color: #120803 !important;
+      }
+
+      /* Sections & Cards */
+      .fire-theme .bg-white, .fire-theme .bg-secondary, .fire-theme .bg-gray-100 {
+        background-color: rgba(26, 15, 15, 0.7) !important;
+        border: 1px solid rgba(255, 69, 0, 0.3);
+        box-shadow: inset 0 0 15px rgba(255, 69, 0, 0.2);
+      }
+
+      /* Buttons & Links */
+      .fire-theme .text-primary { color: var(--fire-glow-color) !important; }
+      .fire-theme .bg-primary {
+        background-color: var(--fire-glow-heavy) !important;
+        border: 1px solid var(--fire-glow-color) !important;
+        box-shadow: 0 0 10px var(--fire-glow-heavy) !important;
+      }
+      .fire-theme .bg-primary:hover {
+        box-shadow: 0 0 20px var(--fire-glow-heavy) !important;
+      }
+      .fire-theme .border-primary { border-color: var(--fire-glow-color) !important; }
+
+      /* About Section Cards */
+      .fire-theme #about .group:hover {
+        border-color: var(--fire-glow-color) !important;
+        box-shadow: 0 0 20px var(--fire-glow-color) !important;
+      }
+       .fire-theme #about .group:hover h4 { color: var(--fire-glow-color) !important; }
+
+      /* SideNav */
+      .fire-theme nav ul li span:not(.absolute) { background-color: #9ca3af !important; }
+      .fire-theme nav ul li a:hover span:not(.absolute) { background-color: var(--fire-glow-color) !important; }
+      .fire-theme nav ul li span[class*="bg-primary"] {
+        background-color: var(--fire-glow-heavy) !important;
+        box-shadow: 0 0 10px var(--fire-glow-heavy);
+      }
+
+      /* Contact Form */
+      .fire-theme form {
+         background-color: rgba(26, 15, 15, 0.9) !important;
+         border: 1px solid rgba(255, 69, 0, 0.5);
+      }
+      .fire-theme input, .fire-theme textarea {
+        background-color: #2d1a14 !important;
+        border-color: #5c3528 !important;
+        color: #e0d7d1 !important;
+      }
+      .fire-theme input:focus, .fire-theme textarea:focus {
+        border-color: var(--fire-glow-color) !important;
+        box-shadow: 0 0 5px var(--fire-glow-color) !important;
+        --tw-ring-color: transparent !important;
+      }
+
+      /* Footer */
+      .fire-theme footer { background-color: #120803 !important; }
+      
+      /* Modals */
+      .fire-theme [role="dialog"] > div { /* This targets the modal content div */
+        background: #1a0f0f !important;
+        border: 2px solid var(--fire-glow-heavy);
+        box-shadow: 0 0 30px var(--fire-glow-heavy);
+      }
+      .fire-theme [role="dialog"] .border-t {
+        border-color: rgba(255, 69, 0, 0.3) !important;
+      }
+
+    </style>
     <script>
       // Prevents FOUC (Flash of Unstyled Content)
       if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
@@ -35,12 +245,32 @@
             },
             animation: {
               'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
+              'fade-in-quick': 'fadeIn 0.3s ease-out forwards',
+              'slide-in-up': 'slideInUp 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards',
+              'fade-out-quick': 'fadeOut 0.3s ease-out forwards',
+              'slide-out-down': 'slideOutDown 0.4s cubic-bezier(0.55, 0.085, 0.68, 0.53) forwards',
             },
             keyframes: {
               fadeInUp: {
                 '0%': { opacity: '0', transform: 'translateY(20px)' },
                 '100%': { opacity: '1', transform: 'translateY(0)' },
               },
+              fadeIn: {
+                '0%': { opacity: '0' },
+                '100%': { opacity: '1' },
+              },
+              fadeOut: {
+                'from': { opacity: '1' },
+                'to': { opacity: '0' },
+              },
+              slideInUp: {
+                '0%': { opacity: '0', transform: 'translateY(50px) scale(0.98)' },
+                '100%': { opacity: '1', transform: 'translateY(0) scale(1)' },
+              },
+              slideOutDown: {
+                'from': { opacity: '1', transform: 'translateY(0) scale(1)' },
+                'to': { opacity: '0', transform: 'translateY(50px) scale(0.98)' },
+              }
             }
           }
         }
@@ -55,10 +285,9 @@
   }
 }
 </script>
-<link rel="stylesheet" href="/index.css">
 </head>
 <body>
 <div id="root"></div>
-<script type="module" src="./src/main.tsx"></script>
+<script type="module" src="/src/main.tsx"></script>
 </body>
 </html>

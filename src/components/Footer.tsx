@@ -25,9 +25,10 @@ interface NavLinkInfo {
 interface FooterProps {
     onNavigate: (sectionId: string) => void;
     navLinks: NavLinkInfo[];
+    onOpenGameModal: () => void;
 }
 
-const Footer: React.FC<FooterProps> = ({ onNavigate, navLinks }) => {
+const Footer: React.FC<FooterProps> = ({ onNavigate, navLinks, onOpenGameModal }) => {
     const currentYear = new Date().getFullYear();
 
     const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, sectionId: string) => {
@@ -68,6 +69,17 @@ const Footer: React.FC<FooterProps> = ({ onNavigate, navLinks }) => {
                                     {link.label}
                                 </a>
                             ))}
+                             <a
+                                href="#"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    onOpenGameModal();
+                                }}
+                                className="text-gray-400 hover:text-primary transition-colors duration-300"
+                                role="button"
+                            >
+                                Fun Zone
+                            </a>
                         </nav>
                     </div>
 

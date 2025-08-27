@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import AIAssist from './AIAssist';
 
 const GithubIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
@@ -19,49 +20,91 @@ const InstagramIcon = () => (
 
 const Contact: React.FC = () => {
     const [formData, setFormData] = useState({ name: '', email: '', message: '' });
-    const [isSubmitted, setIsSubmitted] = useState(false);
+    const [formState, setFormState] = useState({ submitting: false, success: false, error: '' });
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        console.log('Form submitted:', formData);
-        setIsSubmitted(true);
-        setFormData({ name: '', email: '', message: '' });
+    const handleAIGeneratedText = (text: string) => {
+        setFormData(prev => ({ ...prev, message: text }));
+    };
 
-        setTimeout(() => {
-            setIsSubmitted(false);
-        }, 5000);
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        setFormState({ submitting: true, success: false, error: '' });
+
+        try {
+            // This is a placeholder endpoint. A real backend is needed to handle this.
+            const response = await fetch('http://localhost:3001/api/contact', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData),
+            });
+
+            if (!response.ok) {
+                // This will be caught by the catch block
+                throw new Error('Something went wrong on the server. Please try again.');
+            }
+            
+            // Assuming the backend returns a success message
+            await response.json(); 
+
+            setFormState({ submitting: false, success: true, error: '' });
+            setFormData({ name: '', email: '', message: '' });
+            setTimeout(() => setFormState(fs => ({ ...fs, success: false })), 5000);
+
+        } catch (error: any) {
+            setFormState({ 
+                submitting: false, 
+                success: false, 
+                error: error.message || 'An unexpected error occurred. Please try again.' 
+            });
+        }
     };
 
     return (
         <div>
             <h2 className="text-4xl font-bold text-left mb-16 text-dark dark:text-white">Contact Me</h2>
             <div>
-                {isSubmitted && (
+                 {formState.success && (
                     <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded-md shadow-md" role="alert">
                         <p className="font-bold">Message Sent!</p>
                         <p>Thank you for reaching out. I will get back to you shortly.</p>
                     </div>
                 )}
+                {formState.error && (
+                    <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded-md shadow-md" role="alert">
+                        <p className="font-bold">Submission Error</p>
+                        <p>{formState.error}</p>
+                    </div>
+                )}
                 <form onSubmit={handleSubmit} className="bg-white dark:bg-medium p-8 rounded-lg shadow-xl dark:shadow-2xl dark:shadow-primary/10 space-y-6">
                     <div>
                         <label htmlFor="name" className="block text-gray-700 dark:text-gray-300 font-semibold mb-2">Name</label>
-                        <input type="text" name="name" id="name" value={formData.name} onChange={handleChange} className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-primary focus:outline-none bg-gray-50 dark:bg-gray-850 dark:text-white transition-all duration-300" required />
+                        <input type="text" name="name" id="name" value={formData.name} onChange={handleChange} className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-primary focus:outline-none bg-gray-50 dark:bg-gray-850 dark:text-white transition-all duration-300" required disabled={formState.submitting} />
                     </div>
                     <div>
                         <label htmlFor="email" className="block text-gray-700 dark:text-gray-300 font-semibold mb-2">Email</label>
-                        <input type="email" name="email" id="email" value={formData.email} onChange={handleChange} className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-primary focus:outline-none bg-gray-50 dark:bg-gray-850 dark:text-white transition-all duration-300" required />
+                        <input type="email" name="email" id="email" value={formData.email} onChange={handleChange} className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-primary focus:outline-none bg-gray-50 dark:bg-gray-850 dark:text-white transition-all duration-300" required disabled={formState.submitting} />
                     </div>
                     <div>
                         <label htmlFor="message" className="block text-gray-700 dark:text-gray-300 font-semibold mb-2">Message</label>
-                        <textarea name="message" id="message" rows={5} value={formData.message} onChange={handleChange} className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-primary focus:outline-none bg-gray-50 dark:bg-gray-850 dark:text-white transition-all duration-300" required></textarea>
+                        <AIAssist
+                            onGeneratedText={handleAIGeneratedText}
+                            disabled={formState.submitting}
+                            name={formData.name}
+                            email={formData.email}
+                        />
+                        <textarea name="message" id="message" rows={5} value={formData.message} onChange={handleChange} className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-primary focus:outline-none bg-gray-50 dark:bg-gray-850 dark:text-white transition-all duration-300" required disabled={formState.submitting}></textarea>
                     </div>
                     <div className="text-center">
-                        <button type="submit" className="bg-primary hover:bg-primary-dark text-white font-bold py-3 px-8 rounded-full transition-all duration-300 ease-in-out transform hover:scale-105 shadow-lg hover:shadow-xl">
-                            Send Message
+                        <button 
+                            type="submit" 
+                            className="bg-primary hover:bg-primary-dark text-white font-bold py-3 px-8 rounded-full transition-all duration-300 ease-in-out transform hover:scale-105 shadow-lg hover:shadow-xl disabled:bg-gray-400 disabled:cursor-not-allowed disabled:scale-100"
+                            disabled={formState.submitting}
+                        >
+                            {formState.submitting ? 'Sending...' : 'Send Message'}
                         </button>
                     </div>
                 </form>
